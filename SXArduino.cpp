@@ -2,12 +2,11 @@
  * SXAduino.cpp
  *
  *  Version:    3.2
- *  Copyright:  Gerard van der Sel (Debug version)
+ *  Copyright:  Gerard van der Sel
  *
- *  Changed on: 06.12.2017
+ *  Changed on: 25.04.2019
  *  Version: 	3.2
  *  Changes: 	Pin configurable from outside the class
- *              Split read and write to prepare for SX2
  *
  *  Changed on: 27.12.2015
  *  Version: 	3.1
@@ -132,19 +131,19 @@ SXArduino::SXArduino(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_PIN) {
 
 		// initialize pin variables (Memorymapped IO)
 		// Clock (T0)
-//		SX_T0_MASK = digitalPinToBitMask(SX_T0_PIN);
-//		SX_T0_OUT = portOutputRegister(digitalPinToPort(SX_T0_PIN));
-//		SX_T0_IN = portInputRegister(digitalPinToPort(SX_T0_PIN));
-//		SX_T0_DIR = portModeRegister(digitalPinToPort(SX_T0_PIN));
+//	      SX_T0_MASK = digitalPinToBitMask(SX_T0_PIN);
+//		  SX_T0_OUT = portOutputRegister(digitalPinToPort(SX_T0_PIN));
+//		  SX_T0_IN = portInputRegister(digitalPinToPort(SX_T0_PIN));
+//		  SX_T0_DIR = portModeRegister(digitalPinToPort(SX_T0_PIN));
 		// Data in (T1)
 		SX_T1_MASK = digitalPinToBitMask(SX_T1_PIN);
-//		SX_T1_OUT = portOutputRegister(digitalPinToPort(SX_T1_PIN));
+//		  SX_T1_OUT = portOutputRegister(digitalPinToPort(SX_T1_PIN));
 		SX_T1_IN = portInputRegister(digitalPinToPort(SX_T1_PIN));
-//		SX_T1_DIR = portModeRegister(digitalPinToPort(SX_T1_PIN));
+//		  SX_T1_DIR = portModeRegister(digitalPinToPort(SX_T1_PIN));
 		// Data out (D)
 		SX_D_MASK = digitalPinToBitMask(SX_D_PIN);
 		SX_D_OUT = portOutputRegister(digitalPinToPort(SX_D_PIN));
-//		SX_D_IN = portInputRegister(digitalPinToPort(SX_D_PIN));
+//		  SX_D_IN = portInputRegister(digitalPinToPort(SX_D_PIN));
 		SX_D_DIR = portModeRegister(digitalPinToPort(SX_D_PIN));
 		// Check for valid pins
 		bitWrite(_sx_busFlag, SXPINS, (!(digitalPinToPort(SX_T1_PIN) == NOT_A_PIN) && 
@@ -157,8 +156,8 @@ SXArduino::SXArduino(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_LOW_PIN,
 	if ((SX_T0_PIN == 2) || (SX_T0_PIN == 3)) {
 		// For the 4 line interface
 		bitSet(_sx_busFlag, SX4LINE);
-		pinMode(SX_T0_PIN, INPUT);           // SX-T0 is an input, no pull up
-		pinMode(SX_T1_PIN, INPUT);           // SX-T1 is also an input, no pull
+		pinMode(SX_T0_PIN, INPUT_PULLUP);           // SX-T0 is an input,pull  up
+		pinMode(SX_T1_PIN, INPUT_PULLUP);       // SX-T1 is also an input, pull up
 		digitalWrite(SX_D_LOW_PIN, HIGH);
 		pinMode(SX_D_LOW_PIN, OUTPUT);       // SX_D_LOW is output but set high to stop wrting low
 		digitalWrite(SX_D_HIGH_PIN, HIGH);
@@ -166,24 +165,24 @@ SXArduino::SXArduino(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_LOW_PIN,
 
 		// initialize pin variables (Memorymapped IO)
 		// Clock (T0)
-//		SX_T0_MASK = digitalPinToBitMask(SX_T0_PIN);
-//		SX_T0_OUT = portOutputRegister(digitalPinToPort(SX_T0_PIN));
-//		SX_T0_IN = portInputRegister(digitalPinToPort(SX_T0_PIN));
-//		SX_T0_DIR = portModeRegister(digitalPinToPort(SX_T0_PIN));
+//		  SX_T0_MASK = digitalPinToBitMask(SX_T0_PIN);
+//		  SX_T0_OUT = portOutputRegister(digitalPinToPort(SX_T0_PIN));
+//		  SX_T0_IN = portInputRegister(digitalPinToPort(SX_T0_PIN));
+//		  SX_T0_DIR = portModeRegister(digitalPinToPort(SX_T0_PIN));
 		// Data in (T1)
 		SX_T1_MASK = digitalPinToBitMask(SX_T1_PIN);
-//		SX_T1_OUT = portOutputRegister(digitalPinToPort(SX_T1_PIN));
+//		  SX_T1_OUT = portOutputRegister(digitalPinToPort(SX_T1_PIN));
 		SX_T1_IN = portInputRegister(digitalPinToPort(SX_T1_PIN));
-//		SX_T1_DIR = portModeRegister(digitalPinToPort(SX_T1_PIN));
+//		  SX_T1_DIR = portModeRegister(digitalPinToPort(SX_T1_PIN));
 		// Data out (D)
 		SX_D_LOW_MASK = digitalPinToBitMask(SX_D_LOW_PIN);
 		SX_D_LOW_OUT = portOutputRegister(digitalPinToPort(SX_D_LOW_PIN));
-//		SX_D_LOW_IN = portInputRegister(digitalPinToPort(SX_D_LOW_PIN));
-//		SX_D_LOW_DIR = portModeRegister(digitalPinToPort(SX_D_LOW_PIN));
+//		  SX_D_LOW_IN = portInputRegister(digitalPinToPort(SX_D_LOW_PIN));
+//		  SX_D_LOW_DIR = portModeRegister(digitalPinToPort(SX_D_LOW_PIN));
 		SX_D_HIGH_MASK = digitalPinToBitMask(SX_D_HIGH_PIN);
 		SX_D_HIGH_OUT = portOutputRegister(digitalPinToPort(SX_D_HIGH_PIN));
-//		SX_D_HIGH_IN = portInputRegister(digitalPinToPort(SX_D_HIGH_PIN));
-//		SX_D_HIGH_DIR = portModeRegister(digitalPinToPort(SX_D_HIGH_PIN));
+//		  SX_D_HIGH_IN = portInputRegister(digitalPinToPort(SX_D_HIGH_PIN));
+//		  SX_D_HIGH_DIR = portModeRegister(digitalPinToPort(SX_D_HIGH_PIN));
 		// Check for valid pins
 		bitWrite(_sx_busFlag, SXPINS, (!(digitalPinToPort(SX_T1_PIN) == NOT_A_PIN) &&
                                        !(digitalPinToPort(SX_D_LOW_PIN) == NOT_A_PIN) &&
@@ -193,27 +192,24 @@ SXArduino::SXArduino(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_LOW_PIN,
 
 // initialize function
 bool SXArduino::init() {
+    // initialize variables
+    initVars();                                                 // Start looking for SYNC
 	// initialize data array
 	for (int i = 0; i < SX_ADDRESS_NUMBER; i++) {
 		_sxbus[i] = 0;                                          // set sx data to 0
 	}
-	// initialize variables
-	initVars();                                                 // Start looking for SYNC
 	return bitRead(_sx_busFlag, SXPINS);;
 }
 
 void SXArduino::initVars() {
 	// start always with search for header
-	_sx_T0_state = SYNC;                                        // First look for SYNC pattern
-	_sx_T0_sepCount = SX_SEPLEN;                                   // Distanse between two separators
-	_sx_T0_byteCount = SX_STOP;                                    // Check for SX_STOP bits of "0"
-	_sx_D_state = SYNC;                                         // First SYNC pattern
-	_sx_D_sepCount = SX_SEPLEN;                                   // Distanse between two separators
-	_sx_D_byteCount = SX_STOP;                                    // Check for SX_STOP bits of "0"
+	_sx_state = SYNC;                                           // First look for SYNC pattern
+	_sx_sepCount = SX_SEPLEN;                                   // Distanse between two separators
+	_sx_byteCount = SX_STOP;                                    // Check for SX_STOP bits of "0"
 	_sx_dataFrameCount = SX_DATACOUNT;                          // Read all dataframes
 	
 	// no writing to the SX bus
-	_sx_busFlag &= 0xF0;                                        // Reset flags
+	_sx_busFlag &= 0x0F0;                                       // Reset flags
 
 	// Powerbit send and receive
 	_sx_newPWR = 2;                                             // Don't write power bit
@@ -229,16 +225,16 @@ void SXArduino::writeD(uint8_t val) {
 		// For the 4 line interface
 		switch(val) {
 			case 0:
-				*SX_D_LOW_OUT |= SX_D_LOW_MASK;                 // Switch to low
-				*SX_D_HIGH_OUT &= ~SX_D_HIGH_MASK;
-				break;
-			case 1:	
-				*SX_D_HIGH_OUT |= SX_D_HIGH_MASK;               // Switch to high
+				*SX_D_HIGH_OUT |= SX_D_HIGH_MASK;               // Switch to low
 				*SX_D_LOW_OUT &= ~SX_D_LOW_MASK;
+				break;
+			case 1: 
+				*SX_D_LOW_OUT |= SX_D_LOW_MASK;                 // Switch to high
+				*SX_D_HIGH_OUT &= ~SX_D_HIGH_MASK;
 				break;
 			default:	
 				*SX_D_HIGH_OUT |= SX_D_HIGH_MASK;               // Switch to inactive
-				*SX_D_LOW_OUT |= SX_D_HIGH_MASK;
+				*SX_D_LOW_OUT |= SX_D_LOW_MASK;
 				break;
 		}
 	} else {
@@ -265,156 +261,111 @@ void SXArduino::writeD(uint8_t val) {
 void SXArduino::isr() {
 	// Process the T1 signal (read)
 	bitWrite(_sx_busFlag, SXBIT, readT1());                     // read pin
-	switch (_sx_T0_state) {
+	switch (_sx_state) {
 		// Find sync pattern "0001" to start
 		case SYNC:
 			if (bitRead(_sx_busFlag, SXBIT) == LOW) {           // Sync bits "0"
-				if (_sx_T0_byteCount > 0) {                     // If more then 3
-					_sx_T0_byteCount--;
+				if (_sx_byteCount > 0) {                        // If more then 3
+					_sx_byteCount--;
 				}
 			} else {
-				if (_sx_T0_byteCount == 0) {                    // High, read 3 bits low?
-					_sx_T0_state = PWR;                         // Setup for POWER bit
-					_sx_T0_sepCount = SX_SEPLEN - 1;            // Set _sx_sepCount and continue
+				if (_sx_byteCount == 0) {                       // High, read 3 bits low?
+					_sx_state = PWR;                            // Setup for POWER bit
+					_sx_sepCount = SX_SEPLEN - 1;               // Set _sx_sepCount and continue
 					break;
 				}
-				_sx_T0_byteCount = SX_STOP;                     // Error, setup for restart
-				_sx_busFlag &= 0x0F;
+				_sx_byteCount = SX_STOP;                        // Error, setup for restart
+				_sx_busFlag &= 0x0F0;
 			}
 			break;
 		// Read the power bit.
 		case PWR:
-			_sx_T0_sepCount--;
+			_sx_sepCount--;
 			if (_sx_sepCount == 0) {                            // Skip the separator
-				_sx_T0_state = ADDR;                            // Setup for next state ADDR
-				_sx_T0_byteCount = SX_BYTELEN / 2;
-				_sx_T0_sepCount = SX_SEPLEN;
+				writeD(TRI_STATE);		                        // Switch pin to input (let sender set the level)
+				_sx_state = ADDR;                               // Setup for next state ADDR
+				_sx_byteCount = SX_BYTELEN / 2;
+				_sx_sepCount = SX_SEPLEN;
 				_sx_numFrame = 0;
 			} else {
-				bitWrite(_sx_busFlag, SXPWR, bitRead(_sx_busFlag, SXBIT)); //Set PWR Bit in Flag bit
+        if (_sx_newPWR < 2) {
+          writeD(_sx_newPWR);
+          bitWrite(_sx_busFlag, SXPWR, _sx_newPWR & 0x01);
+					_sx_newPWR = 2;                             // Power set
+				} else {
+				  bitWrite(_sx_busFlag, SXPWR, bitRead(_sx_busFlag, SXBIT)); // Read current Power status
+				}
 			}				
 			break;
 		// Read the address bits.
 		case ADDR:  
-			_sx_T0_sepCount--;
-			if (_sx_T0_sepCount == 0) {                         // Skip the separator
-				_sx_T0_sepCount = SX_SEPLEN;
+			_sx_sepCount--;
+			if (_sx_sepCount == 0) {             	            // Skip the separator
+				_sx_sepCount = SX_SEPLEN;
 			} else {
 				_sx_numFrame = (_sx_numFrame * 2) + bitRead(_sx_busFlag, SXBIT); // Read bit into framenumber
-				if ((_sx_T0_byteCount == 2) && (_sx_numFrame == 0)) { // All 4 bits "number of frame" read
+				if ((_sx_byteCount == 2) && (_sx_numFrame == 0)) { // All 4 bits "number of frame" read
 					bitSet(_sx_busFlag, SXSYNC);                // Signal frame 0 for sync purposes
 				}
 			}
 			_sx_byteCount--;
 			if (_sx_byteCount == 0) {                           // Addres part is processed
-				_sx_T0_index =  _sx_numFrame * 7;               // Calculate index
 				// Advance to the next state
-				_sx_T0_state = DATA;                            // Setup for DATA read
+				_sx_state = DATA;                               // Setup for DATA read
 				_sx_byteCount = SX_BYTELEN;
-			}
-			break;
-		// Read the data bits
-		case DATA: 
-			_sx_T0_sepCount--;
-			if (_sx_T0_sepCount == 0) {                         // Skip the separator
-				_sx_T0_sepCount = SX_SEPLEN;
-			} else {
-				_sx_read_data = (_sx_read_data / 2);            // Prepare for reading data
-				bitWrite(_sx_read_data, 7, bitRead(_sx_busFlag, SXBIT)); // Insert the bit
-			}
-			_sx_T0_byteCount--;
-			if (_sx_T0_byteCount == 0) {                        // All bits done
-			    if (_sxbus[_sx_T0_index] < WRITE) {
-					// save read _data
-					_sxbus[_sx_T0_index] = _sx_read_data;       // Save read data in array
-				}
-				// Setup for next read
-				_sx_T0_byteCount = SX_BYTELEN;
-				_sx_T0_index++;
-				// Decrement dataFrameCount
-				_sx_dataFrameCount--;
-				// check, if we already reached the last DATA block - in this
-				// case move on to the next SX-Datenpaket, i.e. look for SYNC
-				if (_sx_dataFrameCount == 0) {
-					// Move on to find SYNC pattern
-					_sx_dataFrameCount = SX_DATACOUNT;
-					_sx_T0_state = SYNC;
-					_sx_T0_byteCount = SX_STOP;
-				}
-			}
-			break;
-		default:
-			writeD(TRI_STATE);                  			    // Switch pin to input
-			initVars();                                         // Start looking for SYNC
-			break;
-	}  //end switch/case _sx_T0_state
-	// Process the D signal (write)
-	switch (_sx_D_state) {
-		// Sync pattern
-		case SYNC:
-			if (_sx_T0_state == PWR) {
-				_sx_D_state == PWR;
-				_sx_D_sepCount = SX_SEPLEN - 1;                 // Set _sx_sepCount and continue
-			}
-			break;
-		// Write the power bit.
-		case PWR:
-			if (_sx_D_sepCount == SX_SEPLEN) {                  // Skip the separator
-				writeD(TRI_STATE);		                        // Switch pin to input (let sender set the level)
-				_sx_D_state = ADDR;                             // Setup for next state ADDR
-			} else {
-				if (_sx_newPWR < 2) {                           // Set power from me
-					writeD(_sx_newPWR);                         // write newPWR
-					_sx_newPWR = 2;                             // Power set
-				}
-			}				
-			break;
-		// The address bits.
-		case ADDR:
-			if (_sx_T0_state = DATA) {
-				// Advance to the next state
-				_sx_D_state = DATA; 
-				_sx_D_index = _sx_T0_index;
-				_sx_D_sepCount = SX_SEPLEN;
+				_sx_index =  _sx_numFrame * 7;                  // Calculate index
 				// Check if we want to write and prepare it
-				if (_sxbus[_sx_D_index] < WRITE) {
-					bitClear(_sx_busFlag, SXWRITING);           // No write
+				if (_sxbus[_sx_index] < WRITE) {
+					bitClear(_sx_busFlag, SXWRITING);           // No write to bus
 				} else {
-					_sx_write_data = lowByte(_sxbus[_sx_D_index]); // Get data to write
-					_sxbus[_sx_D_index] = _sx_write_data;       // Reset write flag
-					bitSet(_sx_busFlag, SXWRITING); 	        // Write
+					_sxbus[_sx_index] &= 0x0FF;                  // Reset write flag
+					_sx_write_data = _sxbus[_sx_index];
+					bitSet(_sx_busFlag, SXWRITING);             // Write to bus
 				}
 			}
 			break;
-		// Write the data bits
-		case DATA:
-			_sx_D_sepCount--;                                   // Skip the separator
-			if (_sx_D_sepCount = 0) {
+		// Read (or write) the data bits
+		case DATA: 
+			_sx_sepCount--;
+			if (_sx_sepCount == 0) {                            // Skip the separator
 				writeD(TRI_STATE);                              // Switch pin to input (let sender set the level)
-				_sx_D_sepCount = SX_SEPLEN;
+				_sx_sepCount = SX_SEPLEN;
 			} else {
 				if (bitRead(_sx_busFlag, SXWRITING)) {          // If we want to write
 					writeD(bitRead(_sx_write_data, 0));         // Write bit to bus
 					_sx_write_data = _sx_write_data / 2;        // Prepare for next write
+				} else {
+  				_sx_read_data = (_sx_read_data / 2);        // Prepare for reading data
+  				bitWrite(_sx_read_data, 7, bitRead(_sx_busFlag, SXBIT)); // Insert the bit
 				}
 			}
-			if (_sx_byteCount == SX_BYTELEN) {                  // All bits done
-				// Setup for next write
-				_sx_D_index++;
+			// Check if all bits done
+			_sx_byteCount--;
+			if (_sx_byteCount == 0) {                           // All bits done
+        // Check if not writing and no new write
+			  if ((!bitRead(_sx_busFlag, SXWRITING)) && (_sxbus[_sx_index] < WRITE)) {
+					_sxbus[_sx_index] = _sx_read_data;          // Save read data in array
+				}
+				// Setup for next read
+				_sx_byteCount = SX_BYTELEN;
+				_sx_index++;
+				// Decrement dataFrameCount
 				// check, if we already reached the last DATA block - in this
 				// case move on to the next SX-Datenpaket, i.e. look for SYNC
-				if (_sx_T0_state == SYNC) {
+				_sx_dataFrameCount--;
+				if (_sx_dataFrameCount == 0) {
 					// Move on to find SYNC pattern
-					_sx_D_state = SYNC;
-					bitClear(_sx_busFlag, SXWRITING);
+					_sx_dataFrameCount = SX_DATACOUNT;
+					_sx_state = SYNC;
+					_sx_byteCount = SX_STOP;
 				} else {
 					// Check if we want to write
-					if (_sxbus[_sx_D_index] < WRITE) {
-						bitClear(_sx_busFlag, SXWRITING);       // No write
+					if (_sxbus[_sx_index] < WRITE) {
+						bitClear(_sx_busFlag, SXWRITING);       // No write to bus
 					} else {
-						_sx_write_data = _sxbus[_sx_D_index] & 0xFF; // Get data to write
-						bitSet(_sx_busFlag, SXWRITING);         // Write
-						_sxbus[_sx_D_index] &= 0xFF;            // Report byte written to SX-bus
+						_sxbus[_sx_index] &= 0x0FF;              // Reset write flag
+						_sx_write_data = _sxbus[_sx_index];
+						bitSet(_sx_busFlag, SXWRITING); 	    // Write to bus
 					}
 				}
 			}
@@ -423,7 +374,7 @@ void SXArduino::isr() {
 			writeD(TRI_STATE);                  			    // Switch pin to input
 			initVars();                                         // Start looking for SYNC
 			break;
-	}  //end switch/case _sx_D_state
+	}  //end switch/case _sx_T0_state
 }
 
 // Convert from SX-bus addresses to index in array.
@@ -446,7 +397,7 @@ uint8_t SXArduino::calcIndex(uint8_t SXadr) {
 int SXArduino::read(uint8_t adr) {
      // returns the value of a SX address
 	if (adr < SX_ADDRESS_NUMBER)  {
-		return _sxbus[calcIndex(adr)] & 0xFF;
+		return _sxbus[calcIndex(adr)] & 0x0FF;
 	} else  {
 		return -1;                                              // Save value
 	}
@@ -458,18 +409,6 @@ uint8_t SXArduino::write(uint8_t adr, uint8_t dt) {
 	if (adr < SX_ADDRESS_NUMBER)  {
 		_sxbus[calcIndex(adr)] = dt | WRITE;
 		return 0;    // success
-	}
-	return 1;    // address out of range
-}
-
-// Checks if the isr has written the data to the SX-bus
-uint8_t SXArduino::isWritten(uint8_t adr) {
-	if (adr < SX_ADDRESS_NUMBER)  {
-		if (_sxbus[calcIndex(adr)] < WRITE) {
-			return 0;   // written
-		} else {
-			return 2;   // not written
-		}
 	}
 	return 1;    // address out of range
 }
@@ -487,7 +426,7 @@ void SXArduino::writePWR(uint8_t val) {
 }
 
 // Every time frame 0 is passed sync bit is set by isr.
-uint8_t SXArduino::inSync() { 
+uint8_t SXArduino::inSync() {
 	if (bitRead(_sx_busFlag, SXSYNC)) {
 		bitClear(_sx_busFlag, SXSYNC);    // reset sync bit to check for next pass
 		return 1;                         // report frame 0 found
