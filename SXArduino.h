@@ -2,12 +2,11 @@
  * SXArduino.h
  *
  *  Version:    3.2
- *  Copyright:  Gerard van der Sel (Debug version)
+ *  Copyright:  Gerard van der Sel
  *
- *  Changed on: 06.12.2017
- *  Version: 	3.2
- *  Changes: 	Pin configurable from outside the class
- *              Split read and write to prepare for SX2
+ *  Changed on: 25.04.2019
+ *  Version:    3.2
+ *  Changes:    Pin configurable from outside the class
  *
  *  Changed on: 27.12.2015
  *  Version: 	3.1
@@ -85,8 +84,8 @@
 #define TRI_STATE           3
 
 // defines for state machine
-#define DATA	            0              // For performance DATA first
-#define SYNC	            1              // (Gives fastest code)
+#define DATA	              0              // For performance DATA first
+#define SYNC	              1              // (Gives fastest code)
 #define PWR                 2
 #define ADDR                3
 
@@ -108,8 +107,7 @@ public:
 	bool init(void);	
 	int read(uint8_t);
 	uint8_t write(uint8_t, uint8_t);
-	uint8_t isWritten(uint8_t);
-    uint8_t readPWR(void);
+  uint8_t readPWR(void);
 	void writePWR(uint8_t);
 	void isr(void);
 	uint8_t inSync(void);
@@ -117,8 +115,8 @@ public:
 private:
 	void initVars();
 	uint8_t calcIndex(uint8_t adr);
-    uint8_t readT1();
-    void writeD(uint8_t val);
+  uint8_t readT1();
+  void writeD(uint8_t val);
 
 	uint8_t _sx_busFlag;                   // Various flags
 #define SXBIT               0              //     Value readbit
@@ -129,49 +127,45 @@ private:
 #define SXPINS              5              //     Flag signaling pins are initialised
 	uint8_t _sx_numFrame;                  // Number of frame 
 	uint8_t _sx_dataFrameCount;            // frame counting
-	uint8_t _sx_T0_state;
-	uint8_t _sx_T0_sepCount;               // bit counting (seperator)
-	uint8_t _sx_T0_byteCount;              // bit counting (byte)
-	uint8_t _sx_T0_index;                  // current index in the array T0
-	uint8_t _sx_D_state;
-	uint8_t _sx_D_sepCount;                // bit counting (seperator)
-	uint8_t _sx_D_byteCount;               // bit counting (byte)
-	uint8_t _sx_D_index;                   // current index in the array D
+	uint8_t _sx_state;
+	uint8_t _sx_sepCount;                  // bit counting (seperator)
+	uint8_t _sx_byteCount;                 // bit counting (byte)
+	uint8_t _sx_index;                     // current index in the array T0
 	
 	uint8_t _sx_newPWR;                    // command POWER on track
 
 	uint8_t _sx_read_data;                 // read data
-    uint8_t _sx_write_data;  	           // data to write
+  uint8_t _sx_write_data;  	           // data to write
 
     // Array for storing SX_bus data
 	uint16_t _sxbus[SX_ADDRESS_NUMBER];    // SX data
 	
-    // Addresses and masks for Memorymapped IO 
-    // Clock (T0)
-//    uint8_t SX_T0_MASK;
-//    uint8_t *SX_T0_OUT;
-//    uint8_t *SX_T0_IN;
-//    uint8_t *SX_T0_DIR;
-    // Data in (T1)
-    uint8_t SX_T1_MASK;
-//    uint8_t *SX_T1_OUT;
-    uint8_t *SX_T1_IN;
-//    uint8_t *SX_T1_DIR;
-    // Data out (D)
-    // For the 3 line interface
-    uint8_t SX_D_MASK;
-    uint8_t *SX_D_OUT;
-//    uint8_t *SX_D_IN;
-    uint8_t *SX_D_DIR;
-    // For the 4 line interface
-    uint8_t SX_D_LOW_MASK;
-    uint8_t *SX_D_LOW_OUT;
-//    uint8_t *SX_D_LOW_IN;
-//    uint8_t *SX_D_LOW_DIR;
-    uint8_t SX_D_HIGH_MASK;
-    uint8_t *SX_D_HIGH_OUT;
-//    uint8_t *SX_D_HIGH_IN;
-//    uint8_t *SX_D_HIGH_DIR;
+  // Addresses and masks for Memorymapped IO 
+  // Clock (T0)
+//  uint8_t SX_T0_MASK;
+//  uint8_t *SX_T0_OUT;
+//  uint8_t *SX_T0_IN;
+//  uint8_t *SX_T0_DIR;
+  // Data in (T1)
+  uint8_t SX_T1_MASK;
+//  uint8_t *SX_T1_OUT;
+  uint8_t *SX_T1_IN;
+//  uint8_t *SX_T1_DIR;
+  // Data out (D)
+  //   For the 3 line interface
+  uint8_t SX_D_MASK;
+  uint8_t *SX_D_OUT;
+//  uint8_t *SX_D_IN;
+  uint8_t *SX_D_DIR;
+  //   For the 4 line interface
+  uint8_t SX_D_LOW_MASK;
+  uint8_t *SX_D_LOW_OUT;
+//  uint8_t *SX_D_LOW_IN;
+//  uint8_t *SX_D_LOW_DIR;
+  uint8_t SX_D_HIGH_MASK;
+  uint8_t *SX_D_HIGH_OUT;
+//  uint8_t *SX_D_HIGH_IN;
+//  uint8_t *SX_D_HIGH_DIR;
 
 	/* SX Timing
 	 1   Bit             50 us
