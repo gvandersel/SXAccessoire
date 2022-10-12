@@ -1,0 +1,29 @@
+#######################################
+# Syntax Coloring Map For Test
+#######################################
+
+#######################################
+#	Datatypes (KEYWORD1)
+#######################################
+
+SXArduino	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+isr	KEYWORD2
+init	KEYWORD2
+read	KEYWORD2
+write	KEYWORD2
+readPWR	KEYWORD2
+writePWR	KEYWORD2
+inSync	KEYWORD2
+checkProg	KEYWORD2
+setProg	KEYWORD2
+claimProg	KEYWORD2
+
+initVars	KEYWORD2
+calcIndex	KEYWORD2
+readT1	KEYWORD2
+writeD	KEYWORD2
