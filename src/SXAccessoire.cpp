@@ -1,5 +1,5 @@
 /*
- * SXAduino.cpp
+ * SXAccessoire.cpp
  *
  *  Version:    3.2
  *  Copyright:  Gerard van der Sel
@@ -119,9 +119,9 @@ This library is free software; you can redistribute it and/or
 
 #include <Arduino.h> 
 
-#include "SXArduino.h"
+#include "SXAccessoire.h"
 
-SXArduino::SXArduino(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_PIN) {
+SXAccessoire::SXAccessoire(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_PIN) {
 	bitClear(_sx_busFlag, SXPINS);
 	if ((SX_T0_PIN == 2) || (SX_T0_PIN == 3)) {
 		// For the 3 line interface
@@ -152,7 +152,7 @@ SXArduino::SXArduino(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_PIN) {
 	}
 }
 
-SXArduino::SXArduino(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_LOW_PIN, uint8_t SX_D_HIGH_PIN) {
+SXAccessoire::SXAccessoire(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_LOW_PIN, uint8_t SX_D_HIGH_PIN) {
 	bitClear(_sx_busFlag, SXPINS);
 	if ((SX_T0_PIN == 2) || (SX_T0_PIN == 3)) {
 		// For the 4 line interface
@@ -192,7 +192,7 @@ SXArduino::SXArduino(uint8_t SX_T0_PIN, uint8_t SX_T1_PIN, uint8_t SX_D_LOW_PIN,
 }
 
 // initialize function
-bool SXArduino::init() {
+bool SXAccessoire::init() {
 	// initialize data array
 	for (int i = 0; i < SX_ADDRESS_NUMBER; i++) {
 		_sxbus[i] = 0;                              // set sx data to 0
@@ -202,7 +202,7 @@ bool SXArduino::init() {
 	return bitRead(_sx_busFlag, SXPINS);;
 }
 
-void SXArduino::initVars() {
+void SXAccessoire::initVars() {
 	// start always with search for header
 	_sx_state = SYNC;                               // First look for SYNC pattern
 	_sx_sepCount = SX_SEPLEN;                       // Distanse between two separators
@@ -217,11 +217,11 @@ void SXArduino::initVars() {
 }
 
 // IO functions (Memorymapped IO)
-uint8_t SXArduino::readT1() {
+uint8_t SXAccessoire::readT1() {
 	return ((*SX_T1_IN & SX_T1_MASK) > 0);          // Read the data on T1 of the SX-bus
 }
 
-void SXArduino::writeD(uint8_t val) {
+void SXAccessoire::writeD(uint8_t val) {
 	if (bitRead(_sx_busFlag, SX4LINE)) {
 		// For the 4 line interface
 		switch (val) {
@@ -261,7 +261,7 @@ void SXArduino::writeD(uint8_t val) {
 // interrupt service routine (AVR INT0/INT1)
 // driven by RISING EDGES of the SX clock signal T0 (SX pin 1)
 // This code is execute every 50 usec (keep it fast as possible)
-void SXArduino::isr() {
+void SXAccessoire::isr() {
 	// Process the T1 signal (read)
 	bitWrite(_sx_busFlag, SXBIT, readT1());         // read pin
 	switch (_sx_state) {
@@ -396,7 +396,7 @@ void SXArduino::isr() {
  *   SXaddress = (15 - framenumber) + (6 - offset) * 16
  * (All 112 addresses, 0 - 111, are availeble if centrale permits.)
  */
-uint8_t SXArduino::calcIndex(uint8_t SXadr) {
+uint8_t SXAccessoire::calcIndex(uint8_t SXadr) {
 	uint8_t frame = 15 - (SXadr & 15);              // Get the frame number
 	uint8_t offset = 6 - (SXadr >> 4);              // Get the offset in the frame
 	return frame * 7 + offset;                      // Calculate the index in the array
@@ -405,7 +405,7 @@ uint8_t SXArduino::calcIndex(uint8_t SXadr) {
 // Public functions 'accessing' the SX-bus
 
 // Read data from the array, filled by the isr.
-int SXArduino::read(uint8_t adr) {
+int SXAccessoire::read(uint8_t adr) {
 	// returns the value of a SX address
 	if (adr < SX_ADDRESS_NUMBER) {
 		return _sxbus[calcIndex(adr)] & 0xFF;       // Return data from the SX-bus
@@ -414,7 +414,7 @@ int SXArduino::read(uint8_t adr) {
 }
 
 // Write data to the array, writing to the SX-bus is done by the isr.
-uint8_t SXArduino::write(uint8_t adr, uint8_t dt) {
+uint8_t SXAccessoire::write(uint8_t adr, uint8_t dt) {
 	// Check if invalid address.
 	if (adr < SX_ADDRESS_NUMBER) {
 		_sxbus[calcIndex(adr)] = dt | WRITE;
@@ -424,19 +424,19 @@ uint8_t SXArduino::write(uint8_t adr, uint8_t dt) {
 }
 
 // Read POWER status from the SX-bus
-uint8_t SXArduino::readPWR() {
+uint8_t SXAccessoire::readPWR() {
 	return bitRead(_sx_busFlag, SXPWR) > 0;
 }
 
 // Write POWER status to the SX-bus and control a connected central.
-void SXArduino::writePWR(uint8_t val) {
+void SXAccessoire::writePWR(uint8_t val) {
 	if (val == 0 || val == 1) {
 		_sx_newPWR = val;
 	}
 }
 
 // Every time frame 0 is passed sync bit is set by isr.
-uint8_t SXArduino::inSync() {
+uint8_t SXAccessoire::inSync() {
 	if (bitRead(_sx_busFlag, SXSYNC) > 0) {
 		// reset sync bit to check for next pass
 		bitClear(_sx_busFlag, SXSYNC);
@@ -456,12 +456,12 @@ uint8_t SXArduino::inSync() {
 #define SXcheckprogbit     4     // Bit for programming control (0 based)
 
 // True if programming allowed
-bool SXArduino::checkProg() {
+bool SXAccessoire::checkProg() {
 	return ((read(SXcheckprogadr) & _BV(SXcheckprogbit)) == 0);
 }
 
 // Set programming state
-void SXArduino::setProg(bool state) {
+void SXAccessoire::setProg(bool state) {
 	byte wait = read(SXcheckprogadr);               // Read status byte from SX-bus
 	write(SXcheckprogadr, (state ? wait | _BV(SXcheckprogbit) : wait & ~_BV(SXcheckprogbit))); // Bit 5 <= state  
 }
@@ -470,7 +470,7 @@ void SXArduino::setProg(bool state) {
 // If possible claim programming by making bit 5 "1" in address 106
 // false: no programming, true: programming
 // Leave with bit 5 address 106 set if programming is possible (claim).
-bool SXArduino::claimProg() {
+bool SXAccessoire::claimProg() {
 	if (checkProg())
 	{
 		setProg(true);

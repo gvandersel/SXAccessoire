@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <SXArduino.h>
+#include <SXAccessoire.h>
 #include "EEOccupianceDetektor\EEOccupianceDetektor.h"
 
 //Pin definitions
@@ -38,7 +38,7 @@
 
 const int debounceVal = 2;
 
-SXArduino SXbus(SX_T0, SX_T1, SX_D_LOW, SX_D_HIGH);
+SXAccessoire SXbus(SX_T0, SX_T1, SX_D_LOW, SX_D_HIGH);
 int debounceWait;
 bool switchPressed;
 bool programming;

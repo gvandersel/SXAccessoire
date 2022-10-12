@@ -26,9 +26,9 @@
 */
 
 #include <Arduino.h>
-#include <SXArduino.h>
+#include <SXAccessoire.h>
 
-SXArduino SXbus(3, 5, 6); // Interface to the SX-bus
+SXAccessoire SXbus(3, 5, 6); // Interface to the SX-bus
 boolean cmdAdr;           // Received byte is a command
 boolean cmdWrite;         // Write command
 uint8_t address;          // Address for reading or writing

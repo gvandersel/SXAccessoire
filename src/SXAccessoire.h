@@ -1,5 +1,5 @@
 /*
- * SXArduino.h
+ * SXAccessoire.h
  *
  *  Version:    3.2
  *  Copyright:  Gerard van der Sel
@@ -61,8 +61,8 @@
 
  */
 
-#ifndef SXArduino_H_
-#define SXArduino_H_
+#ifndef SXAccessoire_H_
+#define SXAccessoire_H_
 // define arduino pins, ports and bits
 // depends on the hardware used.
 #if defined(ARDUINO) && ARDUINO >= 100
@@ -90,10 +90,10 @@
 
 #define WRITE           0x100              // Flag to signal data to write
 
-class SXArduino {
+class SXAccessoire {
 public:
-	SXArduino(uint8_t, uint8_t, uint8_t, uint8_t); // 4 wire interface
-	SXArduino(uint8_t, uint8_t, uint8_t);	// 3 wire interface
+	SXAccessoire(uint8_t, uint8_t, uint8_t, uint8_t); // 4 wire interface
+	SXAccessoire(uint8_t, uint8_t, uint8_t);	// 3 wire interface
 
 	void isr(void);
 	bool init(void);
@@ -173,4 +173,4 @@ private:
 	*/
 };
 
-#endif /* SXArduino_H_ */
+#endif /* SXAccessoire_H_ */

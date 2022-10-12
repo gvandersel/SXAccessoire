@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <SXArduino.h>
+#include <SXAccessoire.h>
 
 //Port definitions
 #define progKey A0                // Switch connected to ground
@@ -12,7 +12,7 @@
 #define SX_D_LOW           5
 #define SX_D_HIGH          6
 // SX-bus interface definitie
-SXArduino SXbus(SX_T0, SX_T1, SX_D_LOW, SX_D_HIGH);
+SXAccessoire SXbus(SX_T0, SX_T1, SX_D_LOW, SX_D_HIGH);
 
 const int debounceVal = 2;
 int debounceWait;
