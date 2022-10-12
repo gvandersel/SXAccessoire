@@ -92,37 +92,6 @@ void readEEprom() {
 
 }
 
-//
-// check programming status
-// True if programming allowed
-bool checkProg() {
-  byte wait = SXbus.read(106);
-  return ((wait & 0x20) == 0);  
-}
-//
-// Set programming
-//
-void setProg(bool state) {
-  byte wait = SXbus.read(106);
-  SXbus.write(106, (state ? wait | 0x20 : wait & 0xDF));  // Bit 5 <= state  
-}
-//
-// Check if programming is posible (bit 5 address 106 is "0")
-// If possible claim programming by making bit 5 "1" in address 106
-// false: no programming, true: programming
-// Leave with bit 5 address 106 set if programming is possible (claim).
-// https://www.digit-electronic.de (Info => SX-wissen)
-//
-bool claimProg() {
-  if (checkProg())
-  {
-    setProg(true);
-    return true;
-  }
-  return false;
-}
-
-
 // For debug perposes only
 void serialEvent() {
     // Read all the data
@@ -171,9 +140,10 @@ void setup() {
   pinMode(progKey, INPUT_PULLUP);
 
   // initialize SX-bus
-  SXbus.init();
-  // Rising edges on INT0 triggers the interrupt routine sxisr (see above)
-  attachInterrupt(0, sxisr, RISING); 
+  if (SXbus.init()) {
+	  // Rising edges on INT0 triggers the interrupt routine sxisr (see above)
+	  attachInterrupt(0, sxisr, RISING); 
+  }
 
   // initialize serial (for debug only):
   Serial.begin(19200);
@@ -214,7 +184,7 @@ void loop() {
       // Reset all variables to initial state
       switchPressed = false;  
       if (programming) {
-        setProg(false);
+        SXbus.setProg(false);
         programming = false;
       }
       digitalWrite(progLED, LOW);                 // LED off
@@ -227,7 +197,7 @@ void loop() {
     } else {
       // No power on the track, on switch press start/stop programming
       if (programming) {
-        if (!checkProg()) {
+        if (!SXbus.checkProg()) {
           if (switchPressed) {
             // In programming mode and key pressed, terminate programming mode
             endprogAccessoire();
@@ -236,7 +206,7 @@ void loop() {
             dataChanged = false;
             // End programming mode  
             programming = false;
-            setProg(false);
+            SXbus.setProg(false);
             switchPressed = false;  
             digitalWrite(progLED, LOW);                 // LED off
           } else {
@@ -251,7 +221,7 @@ void loop() {
           digitalWrite(progLED, LOW);                       // LED off
         }
       } else {
-        if ((switchPressed) && (claimProg())) {
+        if ((switchPressed) && (SXbus.claimProg())) {
           // No power on the track and key pressed, start programmin mode
           startprogAccessoire();
           // Start programming mode
