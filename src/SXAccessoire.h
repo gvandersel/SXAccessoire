@@ -1,8 +1,12 @@
 /*
  * SXAccessoire.h
  *
- *  Version:    3.2
+ *  Version:    3.3
  *  Copyright:  Gerard van der Sel
+ *
+ *  Changed on: 25.10.2023
+ *  Version: 	3.3
+ *  Changes: 	Made ISR all assembly to obtain highest speed (uses less clcokcycles)
  *
  *  Changed on: 16.06.2022
  *  Version: 	3.2
@@ -71,98 +75,96 @@
 #include "WProgram.h"
 #endif
 
-#define TRI_STATE           3              // Don't set data on SX-bus
-#define PWR_SEND            2
-
-// defines for state machine
-#define DATA	            0              // For performance DATA first
-#define SYNC	            1              // (Gives fastest code)
-#define PWR                 2
-#define ADDR                3
+#define TRI_STATE           3                   // Don't set data on SX-bus
+#define PWR_SEND            2                   // Don't set power on SX-bus
 
 // defines for Selectrix constants
-#define SX_STOP             3              // 3 "0" bits achter elkaar
-#define SX_DATACOUNT        7              // 7 dataframes in 1 frame
-#define SX_SEPLEN           3              // 3 bit in a separated part
-#define SX_BYTELEN         12              // 12 bits for one byte
+#define SX_STOP             3                   // 3 "0" bits achter elkaar
+#define SX_SEPLENGTH        3                   // 3 bit in a separated part
+#define SX_BYTELENGTH      12                   // 12 bits for one byte
+#define SX_FRAMELENGTH      7                   // 7 dataframes in 1 frame
 
-#define SX_ADDRESS_NUMBER 112              // Max number SX channels
+#define SX_ADDRESS_NUMBER 112                   // Max number SX channels
 
-#define WRITE           0x100              // Flag to signal data to write
+#define WRITE           0x100                   // Flag to signal data to write
 
 class SXAccessoire {
 public:
-	SXAccessoire(uint8_t, uint8_t, uint8_t, uint8_t); // 4 wire interface
-	SXAccessoire(uint8_t, uint8_t, uint8_t);	// 3 wire interface
+	SXAccessoire(uint8_t, uint8_t, uint8_t, uint8_t);   // 4 wire interface
+	SXAccessoire(uint8_t, uint8_t, uint8_t);	          // 3 wire interface
 
-	void isr(void);
-	bool init(void);
-	int read(uint8_t);
-	uint8_t write(uint8_t, uint8_t);
-	uint8_t readPWR(void);
-	void writePWR(uint8_t);
-	uint8_t inSync(void);
-	bool checkProg(void);
-	void setProg(bool);
-	bool claimProg(void);
-
+	void isr(void);                               // Interrupt service routine, runs in the background
+	bool init(void);                              // Init all variables for the SX-bus, return false if somthing fails
+	int read(uint8_t);                            // Read given address from the SXbus
+	uint8_t write(uint8_t, uint8_t);              // Write data to given address of the SXbus
+	uint8_t readPWR(void);                        // Signals if power is on the track
+	void writePWR(uint8_t);                       // Sets power on or off
+	uint8_t inSync(void);                         // Signals the completion of all addresses
+	bool checkProg(void);                         // Checks if posible to program an accessoire
+	void setProg(bool);                           // Sets or resets programming state for an accessoire
+	bool claimProg(void);                         // Checks and sets programmingstate for an accessoire
 private:
-	void initVars();
-	uint8_t calcIndex(uint8_t adr);
-	uint8_t readT1();
-	void writeD(uint8_t val);
+	void initVars();                              // Sets internal variable for the isr 
+	uint8_t calcIndex(uint8_t adr);               // Addresses are not lineair in the array, so calculate index
+	uint8_t readT1();                             // Read SXbus pin T1 (Serial data from centrale to accessoire)
+  void writeD(uint8_t val);                     // Write SXbus pin D (Serial data form accessoire to centrale)
 
-	uint8_t _sx_busFlag;                    // Various flags
-#define SXBIT               0               //     Value readbit
-#define SXWRITING           1               //     Flag signalling writing is in progress
-#define SXPWR               2               //     Value powerbit (0 = no power, 1 = power)
-#define SXSYNC              3               //     Flag signaling all frames are processed
-#define SX4LINE             4               //     Flag signaling to use 4 line interface
-#define SXPINS              5               //     Flag signaling pins are initialised
-	uint8_t _sx_numFrame;                   // Number of frame 
-	uint8_t _sx_dataFrameCount;             // frame counting
-	uint8_t _sx_state;
-	uint8_t _sx_sepCount;                   // bit counting (seperator)
-	uint8_t _sx_byteCount;                  // bit counting (byte)
-	uint8_t _sx_index;                      // current index in the array
 
-	uint8_t _sx_newPWR;                     // Read or command POWER on track
-	//     0 = no power on track
-	//     1 = power on track
-	//     2 = don't change power
+  volatile uint8_t SXflags;                     // Various flags
+#define SXBIT               0                   //     Value bit read (T1)
+#define SXWRITING           1                   //     Flag signalling writing is in progress
+#define SXPWR               2                   //     Value powerbit (0 = no power, 1 = power)
+#define SXSYNC              3                   //     Flag signaling all frames are processed
+#define SX4LINE             4                   //     Flag signaling to use 4 line interface
+#define SXPINS              5                   //     Flag signaling pins are initialised
+  volatile uint8_t SXstate;
+#define DATA                0                   // For performance DATA first
+#define SYNC                1                   // (Gives fastest code)
+#define PWR                 2
+#define ADDR                3
 
-	uint8_t _sx_read_data;                  // read data (internal)
-	uint8_t _sx_write_data;  	            // write data (internal)
+  volatile uint8_t SXnewPWR;                    // Set POWER on track
+	//     0 = remove power from track
+	//     1 = set power on track
+	//    >2 = don't change power
+ 
+  volatile uint8_t SXframeCount;                // Byte counting for frame
+  volatile uint8_t SXbyteCount;                 // Bit counting for byte
+  volatile uint8_t SXsepCount;                  // Bit counting for separator
+  
+  volatile uint8_t SXframenum;                  // Number off current frame
+  volatile uint8_t SXshift;                     // Data receive/transmit (internal)
+  volatile uint16_t SXindex;                    // Current index in the array
 
 	// Array for storing SX_bus data
-	uint16_t _sxbus[SX_ADDRESS_NUMBER];     // SX data array
+  volatile uint16_t SXarray[SX_ADDRESS_NUMBER]; // SX data array
 
 	// Addresses and masks for Memorymapped IO 
 	// Clock (T0)
-	// uint8_t SX_T0_MASK;
-	// uint8_t *SX_T0_OUT;
-	// uint8_t *SX_T0_IN;
-	// uint8_t *SX_T0_DIR;
+	//  volatile uint8_t SX_T0_MASK;
+	//  volatile uint8_t * SX_T0_OUT;
+	//  volatile uint8_t * SX_T0_IN;
+	//  volatile uint8_t * SX_T0_DIR;
 	// Data in (T1)
-	uint8_t SX_T1_MASK;
-	// uint8_t *SX_T1_OUT;
-	uint8_t* SX_T1_IN;
-	// uint8_t *SX_T1_DIR;
+  volatile uint8_t SX_T1_MASK;
+	//  volatile uint8_t * SX_T1_OUT;
+	volatile uint8_t * SX_T1_IN;
+	//  volatile uint8_t * SX_T1_DIR;
 	// Data out (D)
 	// For the 3 line interface
-	uint8_t SX_D_MASK;
-	uint8_t* SX_D_OUT;
-	// uint8_t *SX_D_IN;
-	uint8_t* SX_D_DIR;
+  volatile uint8_t SX_D_MASK;
+  volatile uint8_t * SX_D_OUT;
+	//  volatile uint8_t * SX_D_IN;
+  volatile uint8_t * SX_D_DIR;
 	// For the 4 line interface
-	uint8_t SX_D_LOW_MASK;
-	uint8_t* SX_D_LOW_OUT;
-	// uint8_t *SX_D_LOW_IN;
-	// uint8_t *SX_D_LOW_DIR;
-	uint8_t SX_D_HIGH_MASK;
-	uint8_t* SX_D_HIGH_OUT;
-	// uint8_t *SX_D_HIGH_IN;
-	// uint8_t *SX_D_HIGH_DIR;
+  volatile uint8_t SX_D_LOW_MASK;
+  volatile uint8_t * SX_D_LOW_OUT;
+	//  volatile uint8_t * SX_D_LOW_IN;
+	//  volatile uint8_t * SX_D_LOW_DIR;
+  volatile uint8_t SX_D_HIGH_MASK;
+  volatile uint8_t * SX_D_HIGH_OUT;
+	//  volatile uint8_t * SX_D_HIGH_IN;
+	//  volatile uint8_t * SX_D_HIGH_DIR;
 
 /* SX Timing
 	1   Bit             50 us
