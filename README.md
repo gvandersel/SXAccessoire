@@ -11,9 +11,9 @@ It is installed at the right place and ready for use.
 
 Use:
 First we have to include the library in our project (sketch). This is done with the following code:
-'''
+```
 #include <SXAccessoire.h>
-'''
+```
 After including the library it is ready for use.
 
 Configuration:
@@ -21,25 +21,25 @@ SXaccessoire has two constructors which configure the Arduino to follow the info
 Which to use depends on the electrical interface (hardware) used to connect to the SX-bus. 
 Examples of this hardware are found in the section "hardware".
 The three wire interface is configured with:
-'''
+```
 #define SX_T0        2            // SXbus clock, must be pin 2 or pin 3
 #define SX_T1        8            // SXbus data from the centrale 
 #define SX_D         4            // SXbus data to the centrale
 
 SXAccessoire SXbus(SX_T0, SX_T1, SX_D);
-'''
+```
 
 With this configuration example the pins 2, 8 and 4 are used to control the interface to the SX-bus.
 
 The four wire interface is configured with:
-'''
+```
 #define SX_T0        2            // SXbus clock, must be pin 2 or pin 3
 #define SX_T1        8            // SXbus data from the centrale
 #define SX_D_HIGH    4            // SXbus data to the centrale (sets high)
 #define SX_D_LOW     5            // SXbus data to the centrale (sets low)
 
 SXAccessoire SXbus(SX_T0, SX_T1, SX_D_LOW, SX_D_HIGH);
-'''
+```
 
 With this configuration example the pins 2, 8, 4 and 5 are used to control the interface to the SX-bus.
 
@@ -50,15 +50,15 @@ Implementing the ISR:
 For communicating with the SX-bus an ISR is defined in the library. This ISR must be called every clock-cycle. 
 Depending on the state of the ISR an action on the SX-bus is performed. To call the ISR in the library there is a function nessesary. 
 The only action requered in the sketsh is calling the isr in the library. Code for this is:
-'''
+```
 // Interrupt service routine. (Int0, Rising edge) 
 void sxisr(void) {
     SXbus.isr();
 } 
-'''
+```
 In setup() the code is activated on a rising edge of the clocksignal (T0 of the SX-bus). 
 Put the following lines in setup() (to initialize SX-bus):
-'''
+```
 void setup() {
     // put your setup code here, to run once:
     ....
@@ -71,7 +71,7 @@ void setup() {
 	
     ....
 }
-'''
+```
 After initialising the interrupt pin is attached to the function so every rising of the clock signal leads to the axecution of the ISR.
 
 We can use the defined functions to read and write to the SX-bus, control power on the track and maintain synchronisity with the SX-bus.
