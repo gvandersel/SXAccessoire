@@ -8,17 +8,17 @@ Also the feedbacks reports on this bus.
 Load the SXAccessoire library with the librarymanager. 
 It is installed at the right place and ready for use.
 ## Use ##
-###Include:###
+### Include ###
 First we have to include the library in our project (sketch). This is done with the following code:
 ```
 #include <SXAccessoire.h>
 ```
 After including the library it is ready for use.
-### Configuration: ###
+### Configuration ###
 SXaccessoire has two constructors which configure the Arduino to follow the information on the SX-bus. 
 Which to use depends on the electrical interface (hardware) used to connect to the SX-bus. 
 Examples of this hardware are found in the section "hardware".
-#### Three wire interface: ####
+#### Three wire interface ####
 The three wire interface is configured with:
 ```
 #define SX_T0        2            // SXbus clock, must be pin 2 or pin 3
